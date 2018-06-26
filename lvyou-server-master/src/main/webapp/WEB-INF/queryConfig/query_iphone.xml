@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Iphone通用查询模块 -->
+<QUERY>
+	<!-- SHO[Start] -->
+	<!-- 根据商品分类ID查询所有管理品牌 -->
+	<SELECT ID="IPHONE_SHO_BRAND_BY_GOODTYPEID">
+		<QUERY-TABLE>T_SHO_BRANDTYPE TSBT LEFT JOIN T_SHO_BRAND TSB ON TSB.id = TSBT.brandId</QUERY-TABLE>
+		<FIELD>TSB.id as id, TSB.siteId as siteId, TSB.name as name,TSB.logoHeight as logoHeight ,TSB.logoWidth  as logoWidth, TSB.address as address, TSB.phoneNo as phoneNo, TSB.intro as intro, TSB.logoUrl as logoUrl, TSB.clickNum as clickNum, TSB.sortWeight as sortWeight, TSB.pubTime as pubTime, TSB.createUser as createUser, TSB.createTime as createTime, TSB.modUser as modUser, TSB.modTime as modTime, TSB.status as status, TSB.remark as remark</FIELD>
+		<WHERE>TSBT.typeId = :typeId</WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	
+	<!-- 根据商品ID查询所有销售店铺信息 -->
+	<SELECT ID="IPHONE_SHO_SALESHOP_BY_GOODID">
+		<QUERY-TABLE>T_SHO_SALESHOP TSSA LEFT JOIN T_SHO_SHOP TSSH ON TSSA.shopId = TSSH.id</QUERY-TABLE>
+		<FIELD>TSSA.id AS id, TSSA.goodsId AS goodsId, TSSA.shopId AS shopId, TSSA.oriPrice AS oriPrice, TSSA.curPrice AS curPrice, TSSH.name AS shopName, TSSH.shopType AS shopType, TSSH.location AS shopLocation, TSSH.shoppingMallId AS shoppingMallId, TSSH.address AS shooAddress, TSSH.phoneNo AS shopPhoneNo,TSSH.picHeight as picHeight, TSSH.picWidth as picWidth,TSSH.signUrl AS shopSignUrl, TSSH.gpsX AS shopGpsX, TSSH.gpsY AS shopGpsY, TSSH.shopInfo AS shopInfo, TSSH.clickNum AS shopClickNum, TSSH.sortWeight AS shopSortWeight, TSSH.pubTime AS shopPubTime, TSSH.brandId AS shopBrandId</FIELD>
+		<WHERE>TSSA.goodsId = :goodsId AND TSSH.status = ':status' AND TSSH.siteId = :siteId</WHERE>
+		<ORDER-BY>TSSH.sortWeight desc, TSSH.clickNum desc</ORDER-BY>
+	</SELECT>
+	<!-- 根据商场ID查询其下所有门店的焦点图信息-->
+	<SELECT ID="IPHONE_SHO_FRONTPAGEOFSTORE_BY_MALLID">
+		<QUERY-TABLE>t_sho_frontpage</QUERY-TABLE>
+		<FIELD>id as id
+		</FIELD>
+		<WHERE> type=1 and  fid in 
+		(select id from t_sho_shoppingmall 
+			where parentId =(select id from t_sho_shoppingmall where type=0 and  id=:id) 
+			and type=1
+		)
+		</WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- SHO[End] -->
+	
+	<!-- PUB[Start] -->
+	<!-- 获取首页活动信息及其关联信息 -->
+	<SELECT ID="IPHONE_PUB_FRONTPAGE_INFO">
+		<QUERY-TABLE>T_SHO_FRONTPAGE TSF LEFT JOIN T_SHO_PROMOTION TSP ON TSF.promoId = TSP.id</QUERY-TABLE>
+		<FIELD>TSF.id AS id, TSF.promoId AS promoId, TSF.title AS title, TSF.content AS content, TSF.picHeight as picHeight,  TSF.picWidth as  picWidth , TSF.picUrl AS picUrl, TSF.pubTime AS pubTime, TSP.id AS spId, TSP.title AS spTitle, TSP.content AS spContent, TSP.startTime AS spStartTime, TSP.endTime AS spEndTime, TSP.pubTime AS spPubTime, TSP.thumbName AS spThumbName, TSP.thumbUrl AS spThumbUrl, TSP.type AS spType, TSP.fid AS spFid, TSP.code AS spCode</FIELD>
+		<WHERE>TSF.siteId = :siteId AND TSF.status = :status AND (TSP.status = :pstatus OR TSP.status IS NULL)</WHERE>
+		<ORDER-BY>TSF.sortWeight DESC, TSF.clickNum DESC, TSP.sortWeight DESC, TSP.clickNum DESC</ORDER-BY>
+	</SELECT>
+	<!-- PUB[End] -->
+</QUERY>

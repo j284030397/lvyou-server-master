@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 购物模块 -->
+<QUERY>
+	<!-- 根据日期获取最大活动编号 -->
+	<SELECT ID="SHO_PROMOTION_CODE">
+		<QUERY-TABLE>T_SHO_PROMOTION</QUERY-TABLE>
+		<FIELD>MAX(CODE) AS mcode</FIELD>
+		<WHERE>CODE LIKE ':date'</WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- 根据用户编号组获取其关注用户信息 -->
+	<SELECT ID="SHOW_ATTENTIONUSERNAME_FOR_USERID">
+			<QUERY-TABLE>T_SHOW_ATTENTIONLIST TSA  LEFT JOIN T_SYS_USER TSU ON  TSA.ATTUSERID=TSU.ID</QUERY-TABLE>
+			<FIELD>TSA.ID AS id, TSA.USERID AS userId,TSA.ATTUSERID AS a_userId,TSU.USERNAME AS a_username</FIELD>
+		<WHERE></WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	 <!-- 根据用户名模糊查询获取其秀客图片信息 -->
+	<SELECT ID="SHOW_PICS_FOR_USERNAME">
+			<QUERY-TABLE>T_SHOW_PIC PIC LEFT JOIN T_SYS_USER UR ON  PIC.USERID=UR.ID</QUERY-TABLE>
+			<FIELD>PIC.ID AS  id,PIC.NAME as name,PIC.GOODSID as goodsId,PIC.INTRO as intro,PIC.PICURL as picUrl,PIC.TYPEID as typeId,PIC.USERID as userId</FIELD>
+		<WHERE>UR.USERNAME LIKE ('%:username%')</WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	  <!-- 根据商品类型查询获取该商品类型下的商品的秀客图片信息 -->
+	<SELECT ID="SHOW_PICS_FOR_GOODSTYPE">
+			<QUERY-TABLE>T_SHOW_PIC  PIC LEFT JOIN T_SHO_GOODS GOODS ON PIC.GOODSID=GOODS.ID LEFT JOIN T_SHO_GOODSTYPE ON  TYPE.ID=GOODS.TYPEID </QUERY-TABLE>
+			<FIELD>PIC.ID AS  id,PIC.NAME AS name,PIC.GOODSID AS goodsId,PIC.INTRO AS intro,PIC.PICURL AS picUrl,PIC.TYPEID AS typeId,PIC.USERID AS userId</FIELD>
+		<WHERE>TYPE.ID = :typeId</WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- 根据商品编号组获取其销售店铺信息 -->
+	<SELECT ID="SHO_SALESHOP_FOR_GOODIDS">
+		<QUERY-TABLE>T_SHO_SALESHOP TSSS LEFT JOIN T_SHO_GOODS TSG ON TSG.ID = TSSS.GOODSID LEFT JOIN T_SHO_SHOP TSSP ON TSSP.ID = TSSS.SHOPID</QUERY-TABLE>
+		<FIELD>TSSS.ID AS saleShopId, TSG.ID AS goodId, TSG.NAME AS goodName, TSG.ORIPRICE AS oriPrice,  TSG.CURPRICE AS curPrice, TSSP.ID AS shopId, TSSP.NAME AS shopName, TSSS.ORIPRICE AS shopOriPrice,  TSSS.CURPRICE AS shopCurPrice, TSSS.ENDDATE AS shopEndDate, TSG.ENDDATE AS endDate</FIELD>
+		<WHERE>TSG.ID IN (:ids)</WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- 根据商品编号组获取其销售个人店铺信息 -->
+	<SELECT ID="SHO_SALESHOP_FOR_GOODIDS_PERSHOP">
+		<QUERY-TABLE>T_SHO_SALESHOP TSSS LEFT JOIN T_SHO_GOODS TSG ON TSG.ID = TSSS.GOODSID LEFT JOIN T_SHO_BRAND TSSP ON TSSP.ID = TSSS.SHOPID</QUERY-TABLE>
+		<FIELD>TSSS.ID AS saleShopId, TSG.ID AS goodId, TSG.NAME AS goodName, TSG.ORIPRICE AS oriPrice,  TSG.CURPRICE AS curPrice, TSSP.ID AS shopId, TSSP.S_NAME AS shopName, TSSS.ORIPRICE AS shopOriPrice,  TSSS.CURPRICE AS shopCurPrice, TSSS.ENDDATE AS shopEndDate, TSG.ENDDATE AS endDate</FIELD>
+		<WHERE>TSG.ID IN (:ids)</WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- 根据商场编号获取其下门店的活动信息 -->
+		<SELECT ID="SHO_PROMOTION_IN_SHOPPINGMALL">
+		<QUERY-TABLE>
+     	  T_SHO_PROMOTION  TP LEFT JOIN T_SHO_SHOPPINGMALL TML ON TP.FID=TML.ID
+		</QUERY-TABLE>
+		<FIELD>TP.ID AS id,TP.SITEID AS siteId,TML.NAME AS mallName,TML.TYPE AS mallType,TP.TITLE AS title,TP.CONTENT AS content,TP.STARTTIME AS startTime,TP.ENDTIME AS endTime,TP.CLICKNUM AS clickNum,TP.SORTWEIGHT AS sortWeight,TP.PUBTIME AS pubTime,TP.CREATEUSER AS createUser,TP.CREATETIME AS createTime,TP.MODUSER AS modUser,TP.MODTIME AS modTime,TP.STATUS AS status,TP.REMARK AS remark,TP.THUMBNAME AS thumbName,TP.THUMBURL AS thumbUrl,TP.TYPE AS type,TP.FID AS fid,TP.CODE AS code</FIELD>
+		<WHERE> TP.TYPE=2  AND TP.FID IN (
+  				SELECT ID FROM T_SHO_SHOPPINGMALL  WHERE ID=:mallId
+				)
+		</WHERE>
+		<ORDER-BY>CREATETIME</ORDER-BY>
+		</SELECT>
+	<!-- 根据品牌编号获取其下店铺的活动信息 -->
+		 <SELECT ID="SHO_PROMOTION_IN_BRAND">
+		<QUERY-TABLE>
+	       ( 
+			 (SELECT  TP.ID AS id,TP.SITEID AS siteId,TB.NAME AS mallName,TP.TYPE AS mallType,TP.TITLE AS title,TP.CONTENT AS content,TP.STARTTIME AS startTime,TP.ENDTIME AS endTime,TP.CLICKNUM AS clickNum,TP.SORTWEIGHT AS sortWeight,TP.PUBTIME AS pubTime,TP.CREATEUSER AS createUser,TP.CREATETIME AS createTime,TP.MODUSER AS modUser,TP.MODTIME AS modTime,TP.STATUS AS status,TP.REMARK AS remark,TP.THUMBNAME AS thumbName,TP.THUMBURL AS thumbUrl,TP.TYPE AS type,TP.FID AS fid,TP.CODE AS code
+	     	 FROM  T_SHO_PROMOTION  TP LEFT JOIN T_SHO_BRAND TB ON   TB.ID =TP.FID WHERE TP.TYPE=0 AND TB.ID=:mallId)
+	     
+	     	 UNION ALL
+	   	   (  SELECT  TP.ID AS id,TP.SITEID AS siteId,TS.NAME AS mallName,TP.TYPE AS mallType,TP.TITLE AS title,TP.CONTENT AS content,TP.STARTTIME AS startTime,TP.ENDTIME AS endTime,TP.CLICKNUM AS clickNum,TP.SORTWEIGHT AS sortWeight,TP.PUBTIME AS pubTime,TP.CREATEUSER AS createUser,TP.CREATETIME AS createTime,TP.MODUSER AS modUser,TP.MODTIME AS modTime,TP.STATUS AS status,TP.REMARK AS remark,TP.THUMBNAME AS thumbName,TP.THUMBURL AS thumbUrl,TP.TYPE AS type,TP.FID AS fid,TP.CODE AS code
+	     	FROM  T_SHO_PROMOTION  TP LEFT JOIN T_SHO_SHOP TS ON   TS.ID =TP.FID  WHERE TP.TYPE=1 AND TS.BRANDID=:brandId)
+	      )T
+   		 </QUERY-TABLE>
+		<FIELD>T.id AS id,T.siteId AS siteId,T.mallName as mallName,T.mallType AS mallType,T.title AS title,T.content AS content,T.startTime AS startTime,T.endTime AS endTime,T.clickNum AS clickNum,T.sortWeight AS sortWeight,T.pubTime AS pubTime,T.createUser AS createUser,T.createTime AS createTime,T.modUser AS modUser,T.modTime AS modTime,T.status AS status,T.remark AS remark,T.thumbName AS thumbName,T.thumbUrl AS thumbUrl,T.fid AS fid,T.code AS code</FIELD>
+		<WHERE></WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- 根据所属主体编号获取包括关联的全部活动记录 -->
+	<SELECT ID="SHO_PROMOTION_ALL">
+		<QUERY-TABLE>
+			(
+			SELECT TSP.ID AS id, TSP.SITEID AS siteId, TSP.TITLE AS title, TSP.CONTENT AS content, TSP.STARTTIME AS startTime, TSP.ENDTIME AS endTime, TSP.CLICKNUM AS clickNum, TSP.SORTWEIGHT AS sortWeight, TSP.PUBTIME AS pubTime, TSP.CREATEUSER AS createUser, TSP.CREATETIME AS createTime, TSP.MODUSER AS modUser, TSP.MODTIME AS modTime, TSP.STATUS AS status , TSP.REMARK AS remark, TSP.THUMBNAME AS thumbName, TSP.THUMBURL AS thumbUrl, TSP.TYPE AS type, TSP.FID AS fid, TSP.CODE AS code , '0' AS promotionType 
+			FROM
+			T_SHO_PROMOTION TSP
+
+			UNION ALL
+			
+			SELECT TSP.ID AS id, TSP.SITEID AS siteId, TSP.TITLE AS title, TSP.CONTENT AS content, TSP.STARTTIME AS startTime, TSP.ENDTIME AS endTime, TSP.CLICKNUM AS clickNum, TSP.SORTWEIGHT AS sortWeight, TSP.PUBTIME AS pubTime, TSP.CREATEUSER AS createUser, TSP.CREATETIME AS createTime, TSP.MODUSER AS modUser, TSP.MODTIME AS modTime, TSP.STATUS AS status , TSP.REMARK AS remark, TSP.THUMBNAME AS thumbName, TSP.THUMBURL AS thumbUrl, 0 AS type, TSB.BRANDID AS fid, TSP.CODE AS code , '1' AS promotionType 
+			FROM
+			T_SHO_BPROMOTION TSB LEFT JOIN T_SHO_PROMOTION TSP ON  TSB.PROMOTIONID = TSP.ID
+			
+			UNION ALL
+			
+			SELECT TSP.ID AS id, TSP.SITEID AS siteId, TSP.TITLE AS title, TSP.CONTENT AS content, TSP.STARTTIME AS startTime, TSP.ENDTIME AS endTime, TSP.CLICKNUM AS clickNum, TSP.SORTWEIGHT AS sortWeight, TSP.PUBTIME AS pubTime, TSP.CREATEUSER AS createUser, TSP.CREATETIME AS createTime, TSP.MODUSER AS modUser, TSP.MODTIME AS modTime, TSP.STATUS AS status , TSP.REMARK AS remark, TSP.THUMBNAME AS thumbName, TSP.THUMBURL AS thumbUrl, 1 AS type, TSS.SHOPID AS fid, TSP.CODE AS code , '1' AS promotionType 
+			FROM
+			T_SHO_SPROMOTION TSS LEFT JOIN T_SHO_PROMOTION TSP ON  TSS.PROMOTIONID = TSP.ID
+			
+			UNION ALL
+			
+			SELECT TSP.ID AS id, TSP.SITEID AS siteId, TSP.TITLE AS title, TSP.CONTENT AS content, TSP.STARTTIME AS startTime, TSP.ENDTIME AS endTime, TSP.CLICKNUM AS clickNum, TSP.SORTWEIGHT AS sortWeight, TSP.PUBTIME AS pubTime, TSP.CREATEUSER AS createUser, TSP.CREATETIME AS createTime, TSP.MODUSER AS modUser, TSP.MODTIME AS modTime, TSP.STATUS AS status , TSP.REMARK AS remark, TSP.THUMBNAME AS thumbName, TSP.THUMBURL AS thumbUrl, 2 AS type, TSM.SHOPPINGMALLID AS fid, TSP.CODE AS code , '1' AS promotionType 
+			FROM
+			T_SHO_MPROMOTION TSM LEFT JOIN T_SHO_PROMOTION TSP ON  TSM.PROMOTIONID = TSP.ID
+			)T
+		</QUERY-TABLE>
+		<FIELD>T.ID AS id, T.SITEID AS siteId, T.TITLE AS title, T.CONTENT AS content, T.STARTTIME AS startTime, T.ENDTIME AS endTime, T.CLICKNUM AS clickNum, T.SORTWEIGHT AS sortWeight, T.PUBTIME AS pubTime, T.CREATEUSER AS createUser, T.CREATETIME AS createTime, T.MODUSER AS modUser, T.MODTIME AS modTime, T.STATUS AS status , T.REMARK AS remark, T.THUMBNAME AS thumbName, T.THUMBURL AS thumbUrl, T.TYPE AS type, T.FID AS fid, T.CODE AS code , T.PROMOTIONTYPE AS promotionType</FIELD>
+		<WHERE></WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- 获取包含code的商品的品信息 -->
+	<SELECT ID="SHO_GINFO_AND_CODE">
+			<QUERY-TABLE>T_SHO_GINFO GI LEFT JOIN T_SHO_GOODSINFO GOI ON  GI.INFOID=GOI.ID</QUERY-TABLE>
+			<FIELD>GI.ID AS id,GI.INFOID AS infoId,GI.GOODSID AS goodsId,GOI.CODE AS code</FIELD>
+		<WHERE></WHERE>
+		<ORDER-BY>GOI.CODE ASC</ORDER-BY>
+	</SELECT>
+	  <!-- 根据商圈id获取其下店铺的所属品牌信息 -->
+  	<SELECT ID="SHO_BRAND_FOR_DISTRICTID">
+			<QUERY-TABLE>t_sho_brand</QUERY-TABLE>
+			<FIELD>id, siteId, name, address, phoneNo, intro, logoUrl, clickNum, sortWeight, pubTime, createUser, createTime, modUser, modTime, status, remark,type</FIELD>
+		<WHERE> id 
+   	 in
+	(select brandId from t_sho_shop where location in(:districtId)
+	</WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- 根据商圈id获取其下门店所属商场信息 -->
+  	<SELECT ID="SHO_SHOPPINGMALL_BY_DISTRICTID">
+			<QUERY-TABLE>t_sho_shoppingmall</QUERY-TABLE>
+			<FIELD>id, siteId, name, type, parentId, address, phoneNo, intro, gpsX, gpsY, location, clickNum, logoUrl, sortWeight, pubTime, createUser, createTime, modUser, modTime, status, remark</FIELD>
+		<WHERE>type=0 and id in (select parentId from t_sho_shoppingmall where  type=1 and location =:districtId)
+		</WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+
+
+	<!-- 根据焦点图类型所属活动及活动所属主体信息 -->
+	  	<SELECT ID="SHO_FRONTPAGE_PROMOTION_ENTITY_BY_FRONTTYPE">
+	<QUERY-TABLE>
+		(
+	(select 
+	TF.id as id, TF.siteId as siteId, TF.type as type, TF.promoId as promoId, TF.title as title, TF.content as content,TF.picHeight as picHeight, TF.picWidth as  picWidth , TF.picUrl as picUrl, TF.clickNum as clickNum, TF.sortWeight as sortWeight, TF.pubTime as pubTime, TF.createUser as createUser, TF.createTime as createTime, TF.modUser as modUser, TF.modTime as modTime, TF.status as status, TF.remark as remark, TF.fid as fid,
+	TP.title as promoTitle,TP.type as entityType,TP.startTime as startTime,TP.endTime as endTime,
+	TF.id as entityId,TF.title  as entityName
+	from  t_sho_frontpage TF left join t_sho_promotion TP on  TF.promoId=TP.id  
+	where TF.type=0)
+	UNION ALL
+	(select 
+	TF.id as id, TF.siteId as siteId, TF.type as type, TF.promoId as promoId, TF.title as title, TF.content as content,TF.picHeight as picHeight, TF.picWidth as  picWidth , TF.picUrl as picUrl, TF.clickNum as clickNum, TF.sortWeight as sortWeight, TF.pubTime as pubTime, TF.createUser as createUser, TF.createTime as createTime, TF.modUser as modUser, TF.modTime as modTime, TF.status as status, TF.remark as remark, TF.fid as fid,
+	TP.title as promoTitle,TP.type as entityType,TP.startTime as startTime,TP.endTime as endTime,
+	TE.id as entityId,TE.name  as entityName
+	from  t_sho_frontpage TF left join t_sho_promotion TP on  TF.promoId=TP.id  
+	 left join  t_sho_brand TE on   TP.fid=TE.id and TP.type=0 
+	where TF.type=1)
+	UNION ALL
+	(select 
+	TF.id as id, TF.siteId as siteId, TF.type as type, TF.promoId as promoId, TF.title as title, TF.content as content,TF.picHeight as picHeight, TF.picWidth as  picWidth , TF.picUrl as picUrl, TF.clickNum as clickNum, TF.sortWeight as sortWeight, TF.pubTime as pubTime, TF.createUser as createUser, TF.createTime as createTime, TF.modUser as modUser, TF.modTime as modTime, TF.status as status, TF.remark as remark, TF.fid as fid,
+	TP.title as promoTitle,TP.type as entityType,TP.startTime as startTime,TP.endTime as endTime,
+	TE.id as entityId,TE.name  as entityName
+	from  t_sho_frontpage TF left join t_sho_promotion TP on  TF.promoId=TP.id  
+	 left join  t_sho_shoppingMall TE on   TP.fid=TE.id and TP.type=2 
+	where TF.type=2)
+	UNION ALL
+	(select 
+	TF.id as id, TF.siteId as siteId, TF.type as type, TF.promoId as promoId, TF.title as title, TF.content as content,TF.picHeight as picHeight, TF.picWidth as  picWidth , TF.picUrl as picUrl, TF.clickNum as clickNum, TF.sortWeight as sortWeight, TF.pubTime as pubTime, TF.createUser as createUser, TF.createTime as createTime, TF.modUser as modeUser, TF.modTime as modTime, TF.status as status, TF.remark as remark, TF.fid as fid,
+	TP.title as promoTitle,TP.type as entityType,TP.startTime as startTime,TP.endTime as endTime,
+	TE.id as entityId,TE.s_name  as entityName
+	from  t_sho_frontpage TF left join t_sho_promotion TP on  TF.promoId=TP.id  
+	 left join  t_sho_brand TE on   TP.fid=TE.id and TP.type=3 
+	where TF.type=3)
+	)T
+	</QUERY-TABLE>
+	<FIELD>T.id as id,T.siteId as siteId,T.type as type,T.promoId as promoId,T.title as title,T.content as content,T.picHeight as picHeight, T.picWidth as  picWidth ,T.picUrl as picUrl,
+	T.clickNum as clickNum,T.sortWeight as sortWeight,T.pubTime as pubTime,T.createUser as createUser,T.createTime as createTime,T.modUser as modUser,
+	T.modTime as modTime,T.status as status,T.remark as remark,T.fid as fid,T.promoTitle as promoTitle,T.entityType as entityType,
+	T.entityId as entityId,T.entityName as entityName,T.startTime as startTime,T.endTime as endTime
+	</FIELD>
+		<WHERE></WHERE>
+		<ORDER-BY></ORDER-BY>
+		</SELECT>
+		
+	<!-- 根据主体id及type获取焦点图信息及所属活动及活动所属主体信息 -->
+	<SELECT ID="SHO_FRONTPAGE_PROMOTION_ENTITY_BY_ENTITYID_ENTITYTYPE">
+			<QUERY-TABLE>
+	(
+	  (select 
+		TF.id as id, TF.siteId as siteId, TF.type as type, TF.promoId as promoId, TF.title as title, TF.content as content,TF.picHeight as picHeight, TF.picWidth as  picWidth , TF.picUrl as picUrl, TF.clickNum as clickNum, TF.sortWeight as sortWeight, TF.pubTime as pubTime, TF.createUser as createUser, TF.createTime as createTime, TF.modUser as modUser, TF.modTime as modTime, TF.status as status, TF.remark as remark, TF.fid as fid,
+		TP.title as promoTitle,TP.type as entityType,
+		TF.id as entityId,TF.TITLE  as entityName
+		from   t_sho_frontpage TF  
+		 left join  t_sho_promotion TP  ON TF.promoId=TP.id
+		where TF.type=0)
+	 
+	  UNION ALL
+	  (select 
+		TF.id as id, TF.siteId as siteId, TF.type as type, TF.promoId as promoId, TF.title as title, TF.content as content,TF.picHeight as picHeight, TF.picWidth as  picWidth , TF.picUrl as picUrl, TF.clickNum as clickNum, TF.sortWeight as sortWeight, TF.pubTime as pubTime, TF.createUser as createUser, TF.createTime as createTime, TF.modUser as modUser, TF.modTime as modTime, TF.status as status, TF.remark as remark, TF.fid as fid,
+		TP.title as promoTitle,TP.type as entityType,
+		TE.id as entityId,TE.name  as entityName
+		from t_sho_shoppingMall TE  
+		 left join t_sho_promotion TP  on   TP.fid=TE.id 
+	   left join t_sho_frontpage  TF on  (TF.promoId=TP.id and TP.type=2) 
+	   where TF.type=2
+	   )
+	   
+	   UNION ALL
+	     (select 
+		TF.id as id, TF.siteId as siteId, TF.type as type, TF.promoId as promoId, TF.title as title, TF.content as content,TF.picHeight as picHeight, TF.picWidth as  picWidth , TF.picUrl as picUrl, TF.clickNum as clickNum, TF.sortWeight as sortWeight, TF.pubTime as pubTime, TF.createUser as createUser, TF.createTime as createTime, TF.modUser as modUser, TF.modTime as modTime, TF.status as status, TF.remark as remark, TF.fid as fid,
+		TP.title as promoTitle,TP.type as entityType,
+		TE.id as entityId,TE.name  as entityName
+		from t_sho_brand TE   
+		 left join   t_sho_promotion TP   on (TP.fid=TE.id and TP.type=0) 
+	   left join t_sho_frontpage TF on  TF.promoId=TP.id 
+		where TF.type=1)
+	   UNION ALL
+	   (
+	   select 
+		TF.id as id, TF.siteId as siteId, TF.type as type, TF.promoId as promoId, TF.title as title, TF.content as content,TF.picHeight as picHeight, TF.picWidth as  picWidth , TF.picUrl as picUrl, TF.clickNum as clickNum, TF.sortWeight as sortWeight, TF.pubTime as pubTime, TF.createUser as createUser, TF.createTime as createTime, TF.modUser as modeUser, TF.modTime as modTime, TF.status as status, TF.remark as remark, TF.fid as fid,
+		TP.title as promoTitle,TP.type as entityType,
+		TE.id as entityId,TE.s_name  as entityName
+		from  t_sho_brand TE  
+		 left join   t_sho_promotion TP ON (TP.fid=TE.id and TP.type=3) 
+	   left join   t_sho_frontpage TF ON  TF.promoId=TP.id 
+		where TF.type=3)
+	   )T
+   </QUERY-TABLE>
+		<FIELD>T.id as id,T.siteId as siteId,T.type as type,T.promoId as promoId,T.title as title,T.content as content,T.picHeight as picHeight, T.picWidth as  picWidth ,T.picUrl as picUrl,
+		T.clickNum as clickNum,T.sortWeight as sortWeight,T.pubTime as pubTime,T.createUser as createUser,T.createTime as createTime,T.modUser as modUser,
+		T.modTime as modTime,T.status as status,T.remark as remark,T.fid as fid,T.promoTitle as promoTitle,T.entityType as entityType,
+		T.entityId as entityId,T.entityName as entityName
+		</FIELD>
+		<WHERE></WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>	
+	 <!-- 获取所有商品的信息 -->
+	<SELECT ID="SELECT_ALL_GOODS">
+			<QUERY-TABLE>T_SHO_GOODS TG LEFT JOIN T_SHO_BRAND TB ON TG.BRANDID=TB.ID</QUERY-TABLE>
+			<FIELD>TG.id as id,TG.siteId as siteId,TG.name as name,TG.typeId as typeId,TG.brandId as brandId,TG.intro as intro,TG.detail as detail,TG.oriPrice as oriPrice,TG.curPrice as curPrice,TG.goodsTag as goodsTag,TG.goodsStatus as goodsStatus,TG.thumbName as thumbName,TG.picHeight as picHeight, TG.picWidth as  picWidth ,TG.thumbUrl as thumbUrl,TG.clickNum as clickNum,TG.sortWeight as sortWeight,TG.pubTime as pubTime,TG.createUser as createUser,TG.createTime as createTime,TG.modUser as modUser,TG.modTime as modTime,TG.status as status,TG.remark as remark,TG.endDate as endDate,TG.isPromo as isPromo,TG.code as code,TG.isShowCode as isShowCode,
+              TB.id as b_id,TB.name as b_name,TB.s_name as s_name,TB.type as type
+      </FIELD>
+		<WHERE></WHERE>
+		<ORDER-BY>TG.pubTime desc</ORDER-BY>
+	</SELECT>
+	<!-- 根据商圈ID获取其下门店所属商场信息 -->
+	<SELECT ID="SELECT_SHOPPINGMALL_BY_DISTRICTID">
+			<QUERY-TABLE>t_sho_shoppingmall</QUERY-TABLE>
+			<FIELD>id, siteId, name, type, parentId, address, phoneNo, intro, gpsX, gpsY, location, clickNum,logoHeight ,logoWidth, logoUrl, sortWeight, pubTime, createUser, createTime, modUser, modTime, status, remark
+			</FIELD>
+		<WHERE>
+		id in (select parentId from t_sho_shoppingmall where type=1 and location=:id) and siteId=:siteId
+		</WHERE>
+		<ORDER-BY>sortWeight desc</ORDER-BY>
+	</SELECT>
+	<!-- 根据商圈ID获取其下店铺所属品牌信息 -->
+	<SELECT ID="SELECT_PERSHOP_BY_DISTRICTID">
+			<QUERY-TABLE>t_sho_brand</QUERY-TABLE>
+			<FIELD>id, siteId, name, address, phoneNo, intro, logoUrl, clickNum, sortWeight, pubTime, createUser, createTime, modUser, modTime, status, remark, s_brandId, s_name, s_shopType, s_location, s_shoppingMallId, s_address, s_phoneNo, s_picHeight,s_picWidth, s_signUrl, s_gpsX, s_gpsY, s_shopInfo, type
+      </FIELD>
+		<WHERE>id in (select id from t_sho_brand where type=1 and s_location=:id) and siteId=:siteId</WHERE>
+		<ORDER-BY>sortWeight desc</ORDER-BY>
+	</SELECT>
+	<!-- 根据代码项名获取所属用户的数据权限 -->
+	<SELECT ID="SELECT_DATAPERMISSION_BY_SYSTEMCODEVALUE">
+			<QUERY-TABLE>T_SHO_DATAPERMISSION sdp,T_SYS_SYSTEMCODEVALUE scv</QUERY-TABLE>
+			<FIELD>sdp.userId as userId,sdp.id as id,sdp.siteId as siteId,sdp.type as type,sdp.typeId as typeId,sdp.typeName as typeName,scv.itemName as itemName
+      </FIELD>
+		<WHERE>sdp.type=scv.itemValue and scv.codeId=6</WHERE>
+		<ORDER-BY>itemName desc</ORDER-BY>
+	</SELECT>
+	<!-- 根据角色编号获取与之绑定的数据权限列表 -->	
+	<SELECT ID="GET_ITEMNAME_FOR_ROLE">
+		<QUERY-TABLE>T_SYS_ROLEOWNERSHIP ros, T_SYS_ROLE r,T_SYS_SYSTEMCODEVALUE scv</QUERY-TABLE>
+		<FIELD>
+		distinct ros.userId as userId,scv.itemName as itemName,r.roleType as roleType 
+		</FIELD>
+		<WHERE>
+		r.roleType=scv.itemValue and scv.codeId=6 and  ( r.roleType=5 or r.roleType=6 or roleType=7 )
+		</WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- 根据数据权限获取绑定的品牌数据 -->	
+	<SELECT ID="GET_BRAND_FOR_DATA">
+		<QUERY-TABLE>T_SHO_BRAND b,T_SHO_DATAPERMISSION dp</QUERY-TABLE>
+		<FIELD>
+		b.id as id,b.siteId as siteId,name,address,phoneNo,intro,logoUrl,clickNum,sortWeight,pubTime,b.createUser as createUser,b.createTime,b.modUser as modUser,b.modTime,b.status as status,b.remark as remark,s_brandId ,s_name,s_shopType,s_location,s_shoppingMallId,s_address,s_phoneNo,s_signUrl,s_gpsX,s_gpsY,s_shopInfo,b.type as type  
+		</FIELD>
+		<WHERE>
+		dp.typeId=b.id  and dp.type=:types and b.type =:type and b.siteId =:siteId and dp.userId=:userId
+		</WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- 根据数据权限获取绑定的商场数据 -->	
+	<SELECT ID="GET_SHOP_FOR_DATA">
+		<QUERY-TABLE>T_SHO_SHOPPINGMALL b,T_SHO_DATAPERMISSION dp</QUERY-TABLE>
+		<FIELD>
+		b.id as id,b.siteId as siteId,name,b.type as type,parentId,address,logoUrl,phoneNo,intro,gpsX,gpsY,location,clickNum,sortWeight,b.createUser as createUser,b.createTime as createTime,b.modUser as modUser,b.modTime as modUser,b.status as status,b.remark as remark   
+		</FIELD>
+		<WHERE>
+		dp.typeId=b.id  and dp.type=:types and b.siteId =:siteId and dp.userId=:userId
+		</WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- 获取不要数据权限中品牌数据 -->	
+	<SELECT ID="GET_BRAND_NO_DATA">
+		<QUERY-TABLE>T_SHO_BRAND b</QUERY-TABLE>
+		<FIELD>
+		 (select name from T_SYS_ORG where id=b.workdeptid) as area,
+		 (select name from T_SYS_ORG where id=(select parentid from T_SYS_ORG where id=b.workdeptid) and orgtype=0) as dep,
+		b.id as id,b.siteId as siteId,name,address,phoneNo,intro,logoUrl,clickNum,sortWeight,pubTime,b.createUser as createUser,b.createTime,b.modUser as modUser,b.modTime,b.status as status,b.remark as remark,s_brandId ,s_name,s_shopType,s_location,s_shoppingMallId,s_address,s_phoneNo,s_signUrl,s_gpsX,s_gpsY,s_shopInfo,b.type as type  
+		</FIELD>
+		<WHERE>
+		 b.type =:type and b.siteId =:siteId and b.id not in (select typeId from T_SHO_DATAPERMISSION where type=:types and userId=:userId)
+		</WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- 根据数据权限获取绑定的商场数据(不要数据权限中商场数据) -->	
+	<SELECT ID="GET_SHOP_NO_DATA">
+		<QUERY-TABLE>T_SHO_SHOPPINGMALL b</QUERY-TABLE>
+		<FIELD>
+		b.id as id,b.siteId as siteId,name,b.type as type,parentId,address,logoUrl,phoneNo,intro,gpsX,gpsY,location,clickNum,sortWeight,b.createUser as createUser,b.createTime as createTime,b.modUser as modUser,b.modTime as modUser,b.status as status,b.remark as remark   
+		</FIELD>
+		<WHERE>
+		b.siteId =:siteId and b.id not in (select typeId from T_SHO_DATAPERMISSION where type=:types and userId=:userId)
+		</WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+</QUERY>

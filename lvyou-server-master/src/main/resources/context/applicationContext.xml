@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:aop="http://www.springframework.org/schema/aop"
+ xmlns:cache="http://www.springframework.org/schema/cache" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/util 
+						http://www.springframework.org/schema/util/spring-util-3.2.xsd
+						http://www.springframework.org/schema/tx
+						http://www.springframework.org/schema/tx/spring-tx.xsd
+						http://www.springframework.org/schema/jee 
+						http://www.springframework.org/schema/jee/spring-jee-3.2.xsd
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+						 http://www.springframework.org/schema/cache
+ http://www.springframework.org/schema/cache/spring-cache.xsd">
+
+
+	<context:annotation-config />
+	<context:property-placeholder
+		location="classpath:/context/application.properties" />
+
+	<!-- Database Configuration -->
+	<import resource="hibernateContext.xml" />
+	<import resource="applicationContext-cache.xml" />
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"
+		lazy-init="true" />
+
+	<!-- Transaction manager for a single Hibernate SessionFactory (alternative 
+		to JTA) -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- Transaction template for Managers, from: http://blog.exis.com/colin/archives/2004/07/31/concise-transaction-definitions-spring-11/ -->
+	<bean id="txProxyTemplate" abstract="true"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="transactionAttributes">
+			<props>
+				<!-- ISOLATION_DEFAULT ISOLATION_READ_UNCOMMITTED ISOLATION_READ_COMMITTED 
+					ISOLATION_REPEATABLE_READ ISOLATION_SERIALIZABLE PROPAGATION_REQUIRED PROPAGATION_SUPPORTS 
+					PROPAGATION_REQUIRES_NEW PROPAGATION_NOT_SUPPORTED PROPAGATION_NEVER PROPAGATION_NESTED 
+					<prop key="save*">PROPAGATION_REQUIRED</prop> <prop key="remove*">PROPAGATION_REQUIRED</prop> 
+					<prop key="update*">PROPAGATION_REQUIRED</prop> <prop key="*">PROPAGATION_REQUIRED,readOnly</prop -->
+				<prop key="query*">PROPAGATION_SUPPORTS,readOnly</prop>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 添加spring事务 -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="query*" read-only="true" propagation="REQUIRED" />
+			<!-- 加上后事务不提交了。即增加对此方法的事务管理。但hibernate.connection.autocommit配成了true表示手动控制事务的提交。导致数据没有真正插入数据库 -->
+			<!-- 
+			对事务的总结：
+				1.hibernate.connection.autocommit配成了true表示手动控制事务的提交(如果自己不commit会导致数据没有真正插入数据库 )
+				2. <tx:method name="getBusiData*"  增加对此方法的事务管理
+				3.rollback-for="Exception"  触发回滚的异常类
+				4.  read-only="false"  是否只读，如果设为true,则数据插入时会报异常。
+				5.内部的异常可以先不处理，往上抛出。最后再统一处理。
+				6.spring事务不回滚的原因，在方法里面使用了try catch()将异常捕获了，异常没有向上抛出,异常没有传到,事务监控的方法上来。
+				7.spring事务不回滚的原因二，同一service类中的,没有事务管理 A方法 调用 采用了声明式事务B方法 。
+				在方法 A 中调用方法 B，实际上是通过“this”的引用，也就是直接调用了目标类的方法，而非通过 Spring 上下文获得的代理类，所以事务是不会开启的
+				8.rollbackFor。 默认不配rollbackFor异常类，只有当遇到运行时异常才会回滚，非检查异常是不会回滚，所以需要配rollbackFor="Exception"
+				9.声明式事务应当在service类的第一个方法，不应当由service类的其它方法去调用，这样的话加上它上面的事务将不会起作用。
+			 -->
+			 <tx:method name="getBusiData*" read-only="false" propagation="REQUIRED" rollback-for="Exception"/> 
+			<tx:method name="update*" propagation="REQUIRED" read-only="false"
+				rollback-for="Exception" />
+			<tx:method name="creat*" propagation="REQUIRED" read-only="false"
+				rollback-for="Exception" />
+			<tx:method name="delete*" propagation="REQUIRED" read-only="false"
+				rollback-for="Exception" />
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+		<aop:pointcut id="fooServiceOperation"
+			expression="execution(* com.dev.lvyou.service.*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="fooServiceOperation" />
+	</aop:config>
+
+
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<!-- 添加spring事务end -->
+
+	<context:component-scan base-package="com.dev.scan.*">
+		<!-- <context:exclude-filter type = "annotation" expression = "org.springframework.stereotype.Service" 
+			/> -->
+	</context:component-scan>
+
+	<context:component-scan base-package="com.mock.*">
+	</context:component-scan>
+	<context:component-scan base-package="com.dev.lvyou.*">
+	</context:component-scan>
+	<context:component-scan base-package="com.dev.base.*">
+	</context:component-scan>
+
+
+	<!-- <bean class="com.dev.base.spring.SpringApplicationContext" lazy-init="false"></bean> -->
+	<bean class="com.dev.base.spring.SpringContextHolder" lazy-init="false"></bean>
+	<!-- spring mvc如果要接收 multipart/form-data 传输的数据，应该在spring上下文配置 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8" />
+		<!-- 指定所上传文件的总大小不能超过200KB。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->
+		<!-- <property name="maxUploadSize" value="200000"/> -->
+		<!-- 指定上传文件的临时路径 -->
+		<!-- <property name="uploadTempDir" value="uploadTempDirectory" /> -->
+	</bean>
+<!-- 启用缓存注解功能，这个是必须的，否则注解不会生效，另外，该注解一定要声明在spring主配置文件中才会生效 -->
+	<cache:annotation-driven cache-manager="cacheManager"   key-generator="surveyKeyGenerator"/>
+
+</beans>

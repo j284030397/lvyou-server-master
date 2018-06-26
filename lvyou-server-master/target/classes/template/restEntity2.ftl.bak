@@ -1,0 +1,22 @@
+package ${packageRoot}.domain;
+
+import java.util.Date;
+import ${packageRoot}.common.vo.PageVo;
+
+/**
+
+ */
+public class ${tableClassName} extends PageVo{
+	
+<#list list as map>
+	<#list map?keys as itemKey>
+	     <#if itemKey="phone">
+	     	Phone:${map[itemKey]}
+	     </#if>
+	     <#if itemKey="email">
+	     	Email:${map[itemKey]}
+	     </#if>
+	</#list>
+</#list>
+	
+}

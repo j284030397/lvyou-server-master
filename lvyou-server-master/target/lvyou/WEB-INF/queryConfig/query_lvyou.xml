@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 系统内部 -->
+<QUERY>
+	<!-- <SELECT ID="query_qryHotTouristSpotList">
+		<QUERY-TABLE> T_Ly_HotTouristSpots  left join  T_Ly_TouristSpots t on t.SID=  T_Ly_HotTouristSpots.SpotSid</QUERY-TABLE>
+		<FIELD> t.SID AS sid,
+       t.SpotName AS spotName,
+       t.Address AS address,
+       t.telephone AS telephone,
+       t.Uid AS uid,
+       t.Location AS location,
+       t.Lat AS lat,
+       t.Lng AS lng,
+       t.StreetId AS streetId,
+       t.IsDetail AS isDetail,
+       t.ProvinceSid AS provinceSid,
+       t.CitySid AS citySid,
+       t.TotalPeople AS totalPeople,
+       t.CTime AS cTime,
+       t.Memo AS memo</FIELD>
+		<WHERE></WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY>T_Ly_HotTouristSpots.totalPeople DESC</ORDER-BY>
+	</SELECT> -->
+	<!-- 
+	<SELECT ID="query_HotTouristSpotList">
+		<QUERY-TABLE>  t_ly_hottouristspots  h 
+		 left join  T_Ly_TouristSpots t on t.SID=  h.SpotSid 
+		 left join t_ly_wantto w on (w.SpotSid =h.SpotSid and  w.UserName= ':userName' )</QUERY-TABLE>
+		<FIELD> t.SID AS sid,
+       t.SpotName AS spotName,
+       t.Address AS address,
+       t.telephone AS telephone,
+       t.Uid AS uid,
+       t.Location AS location,
+       t.Lat AS lat,
+       t.Lng AS lng,
+       t.StreetId AS streetId,
+       t.IsDetail AS isDetail,
+       t.ProvinceSid AS provinceSid,
+       t.CitySid AS citySid,
+       t.TotalPeople AS totalPeople,
+       t.CTime AS cTime,
+       t.Memo AS memo,
+	 	 (case when  w.SpotSid is not null and w.UserName=':userName'   then 1 else 0 end) as attention  </FIELD>
+		<WHERE></WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY> h.totalPeople DESC </ORDER-BY>
+	</SELECT>
+	 -->
+	 <SELECT ID="query_HotTouristSpotList">
+		<QUERY-TABLE> 
+		t_ly_hottouristspots h left join  T_Ly_TouristSpots t
+on h.SpotSid=t.SID 
+		</QUERY-TABLE>
+		<FIELD>t.SID AS sid,
+t.SpotName AS spotName,
+t.Address AS address,
+t.telephone AS telephone,
+t.Uid AS uid,
+t.Location AS location,
+t.Lat AS lat,
+t.Lng AS lng,
+t.StreetId AS streetId,
+t.IsDetail AS isDetail,
+t.ProvinceSid AS provinceSid,
+t.CitySid AS citySid,
+h.TotalPeople AS totalPeople,
+t.CTime AS cTime,
+t.Memo AS memo, h.totalPeople,
+
+ (select count(*) from t_ly_wantto w  where w.SpotSid =t.SID and  w.UserName= ':userName' ) as attention,
+ 
+  (select count(*) from t_ly_wantto w2 left join t_ly_userinfo u on w2.UserName=u.UserName
+  left join t_ly_areainfo a2 on u.AreaSid=a2.SID
+              where  u.AreaSid =a2.SID  and w2.SpotSid=t.SID
+ ) as totalPeopleCity
+		 </FIELD>
+		<WHERE></WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY> h.totalPeople DESC </ORDER-BY>
+	</SELECT>
+	<SELECT ID="query_HotTouristSpotListNoLogin">
+		<QUERY-TABLE>  t_ly_hottouristspots  h 
+		 left join  T_Ly_TouristSpots t on t.SID=  h.SpotSid 
+		</QUERY-TABLE>
+		<FIELD> t.SID AS sid,
+       t.SpotName AS spotName,
+       t.Address AS address,
+       t.telephone AS telephone,
+       t.Uid AS uid,
+       t.Location AS location,
+       t.Lat AS lat,
+       t.Lng AS lng,
+       t.StreetId AS streetId,
+       t.IsDetail AS isDetail,
+       t.ProvinceSid AS provinceSid,
+       t.CitySid AS citySid,
+      h.TotalPeople AS totalPeople,
+       t.CTime AS cTime,
+       t.Memo AS memo </FIELD>
+		<WHERE></WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY> h.totalPeople DESC </ORDER-BY>
+	</SELECT>
+	
+		<SELECT ID="query_HotCityList">
+		<QUERY-TABLE> 
+			t_ly_hotcity   h
+		 left join T_Ly_AreaInfo t on h.CitySid= t.SID 
+		</QUERY-TABLE>
+		<FIELD>
+		 t.SID AS sid,
+       t.AreaName AS areaName,
+       t.Letter AS letter,
+       t.PAreaSid AS pAreaSid,
+       t.AreaType AS areaType,
+       t.IsEnabled AS isEnabled,
+       t.Uid AS uid,
+       t.Lat AS lat,
+       t.Lng AS lng,
+       h.TotalPeople AS totalPeople,
+       t.Pos AS pos,
+       t.CTime AS cTime,
+       t.Memo AS memo,
+       (select count(*) from t_ly_userwanttocity w  where w.CitySid =t.SID and  w.UserName= ':userName' ) as attention,
+        (select count(*) from t_ly_userwanttocity w2 left join t_ly_userinfo u on w2.UserName=u.UserName
+  left join t_ly_areainfo a2 on u.AreaSid=a2.SID
+              where  u.AreaSid =a2.SID  and w2.CitySid=t.SID
+ ) as totalPeopleCity
+		 </FIELD>
+		<WHERE></WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY>h.TotalPeople DESC </ORDER-BY>
+	</SELECT>
+	
+		<SELECT ID="query_HotCityListNoLogin">
+		<QUERY-TABLE> 
+		t_ly_hotcity   h
+		 left join T_Ly_AreaInfo t on h.CitySid= t.SID 
+		 	
+		</QUERY-TABLE>
+		<FIELD>
+		 t.SID AS sid,
+       t.AreaName AS areaName,
+       t.Letter AS letter,
+       t.PAreaSid AS pAreaSid,
+       t.AreaType AS areaType,
+       t.IsEnabled AS isEnabled,
+       t.Uid AS uid,
+       t.Lat AS lat,
+       t.Lng AS lng,
+       h.TotalPeople AS totalPeople,
+       t.Pos AS pos,
+       t.CTime AS cTime,
+       t.Memo AS memo 
+		 </FIELD>
+		<WHERE></WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY>h.TotalPeople DESC </ORDER-BY>
+	</SELECT>
+	
+	<SELECT ID="query_CityListBySid">
+		<QUERY-TABLE> 
+		t_ly_hotcity   h
+		 left join T_Ly_AreaInfo t on h.CitySid= t.SID 
+		 	 left join t_ly_userwanttocity w on (w.CitySid =h.CitySid and  w.UserName= ':userName' ) 
+		</QUERY-TABLE>
+		<FIELD>
+		 t.SID AS sid,
+       t.AreaName AS areaName,
+       t.Letter AS letter,
+       t.PAreaSid AS pAreaSid,
+       t.AreaType AS areaType,
+       t.IsEnabled AS isEnabled,
+       t.Uid AS uid,
+       t.Lat AS lat,
+       t.Lng AS lng,
+       h.TotalPeople AS totalPeople,
+       t.Pos AS pos,
+       t.CTime AS cTime,
+       t.Memo AS memo,
+		 	 (case when  w.CitySid is not null and w.UserName=':userName'   then 1 else 0 end) as attention  
+		 </FIELD>
+		<WHERE> t.SID=:citySid</WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY>h.TotalPeople DESC </ORDER-BY>
+	</SELECT>
+	
+	<SELECT ID="query_qryHotCityList">
+		<QUERY-TABLE> t_ly_hotcity   left join T_Ly_AreaInfo t
+on t_ly_hotcity.CitySid= t.SID</QUERY-TABLE>
+		<FIELD> t.SID AS sid,
+       t.AreaName AS areaName,
+       t.Letter AS letter,
+       t.PAreaSid AS pAreaSid,
+       t.AreaType AS areaType,
+       t.IsEnabled AS isEnabled,
+       t.Uid AS uid,
+       t.Lat AS lat,
+       t.Lng AS lng,
+       h.TotalPeople AS totalPeople,
+       t.Pos AS pos,
+       t.CTime AS cTime,
+       t.Memo AS memo</FIELD>
+		<WHERE></WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY>t_ly_hotcity.TotalPeople DESC</ORDER-BY>
+	</SELECT>
+	
+	<!-- 通过返回spotsid查景点信息，及标记数据，同城数据(未登录) -->
+		<SELECT ID="query_SpotsListByName">
+		<QUERY-TABLE> 
+			t_ly_hotcity   h
+		 left join T_Ly_AreaInfo t on h.CitySid= t.SID 
+		</QUERY-TABLE>
+		<FIELD>
+		 t.SID AS sid,
+       t.AreaName AS areaName,
+       t.Letter AS letter,
+       t.PAreaSid AS pAreaSid,
+       t.AreaType AS areaType,
+       t.IsEnabled AS isEnabled,
+       t.Uid AS uid,
+       t.Lat AS lat,
+       t.Lng AS lng,
+       h.TotalPeople AS totalPeople,
+       t.Pos AS pos,
+       t.CTime AS cTime,
+       t.Memo AS memo,
+       (select count(*) from t_ly_userwanttocity w  where w.CitySid =t.SID and  w.UserName= ':userName' ) as attention,
+        (select count(*) from t_ly_userwanttocity w2 left join t_ly_userinfo u on w2.UserName=u.UserName
+  left join t_ly_areainfo a2 on u.AreaSid=a2.SID
+              where  u.AreaSid =a2.SID  and w2.CitySid=t.SID
+ ) as totalPeopleCity
+		 </FIELD>
+		<WHERE></WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY>h.TotalPeople DESC </ORDER-BY>
+	</SELECT>
+</QUERY>

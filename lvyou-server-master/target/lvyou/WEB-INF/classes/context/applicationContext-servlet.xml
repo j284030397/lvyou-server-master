@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd  
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd 
+       http://www.springframework.org/schema/util 
+						http://www.springframework.org/schema/util/spring-util-3.2.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd   
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+	<!--开启上下文注解配置 启用spring注解 -->
+	<!-- 使@Autowire注解被支持 -->
+	<context:annotation-config />
+	<!-- 开启默认处理 -->
+	<!-- 这样静态资源就可以访问了 -->
+	<mvc:default-servlet-handler />
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<util:list>
+				<bean id="myStringHttpMessageConverter2" class="com.dev.base.util.MyStringHttpMessageConverter2" />
+			</util:list>
+		</property>
+	</bean>
+	<!-- 开启注解驱动 -->
+	<!-- 这样可以使用@Controller这些注解 -->
+	<mvc:annotation-driven />
+
+	<import resource="classpath:springmvc-resteasy.xml" />
+	<!-- 配置@Controller注解扫描包 -->
+	<context:component-scan base-package="com.dev.system.*"></context:component-scan>
+    <!--静态资源映射-->
+	<!-- <mvc:resources location="/images/" mapping="/images/**"></mvc:resources> 
+		<mvc:resources location="/uploadfile/" mapping="/uploadfile/**"></mvc:resources> -->
+	<mvc:default-servlet-handler />
+
+	<!-- 使用HandlerInterceptorAdapter,实现Filter的所有功能，还可以更精确的控制拦截精度 -->
+	<bean id="tokenInterceptor" class="com.dev.system.web.security.TokenInterceptor">
+		<property name="zhangxueyou" value="9" />
+		<!-- 
+		<property name="openingTime" value="9" /> 
+		<property name="closingTime" value="12" /> -->
+		<!-- 
+		<property name="mappingURL" value=".*/user\.do\?action=reg.*" />
+		<property name="mappingURL" value="*/datasrv/qryData/" />
+		 -->
+		<property name="mappingURL" value="/**" />
+	</bean>
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="interceptors">
+			<list>
+				<ref bean="tokenInterceptor" />
+			</list>
+		</property>
+	</bean>
+
+</beans>

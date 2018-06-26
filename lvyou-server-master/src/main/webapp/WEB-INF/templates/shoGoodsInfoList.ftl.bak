@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <title>鏃朵唬鍦颁骇</title>
+    <link href="/shogoods/css/public.css" type="text/css" rel="stylesheet" />
+        <script type="text/javascript" src="/shogoods/js/jquery-1.9.1.min.js"></script>
+     <script type="text/javascript" src="/shogoods/js/public.js"></script>
+</head>
+
+<body type="1">
+    <div class="head clearfix">
+        <div class="logo">鏃朵唬鍦颁骇瀹氫环绯荤粺</div>
+        <div class="userMenu">
+            <img src="/images/head.png" /> <span class="hName"> Lily Yang</span>
+            <a class="dBtn"></a>
+            <a class="backBtn"></a>
+        </div>
+    </div>
+    <div class="main">
+        <div class="menu clearfix">
+            <a class="on"><img src="/images/hours.png" /><span>鎴垮眿瀹氫环</span></a>
+            <a><img src="/images/pen.png" /><span>瀹氫环妯℃澘璁剧疆</span></a>
+        </div>
+        <div class="cont">
+            <div class="mangerDiv">
+                <div class="funDiv"><a class="addCase"><span>鏂板瀹氫环鏂规</span></a></div>
+                <div class="optionDiv clearfix">
+                    <div class="leftPan">
+                        <input type="text" class="caseInput fl mrt15" placeholder="璇疯緭鍏ユ柟妗堝悕" />
+                       
+
+ 					  <div class="select_def fl selLoud" id="hxDiv">
+                        <a>璇烽�夋嫨妤兼爧</a>
+                        <div class="marks"></div>
+                        <input name="" type="hidden" value="" id="inputselect3" />
+                        <ul>
+                            <li><a href="javascript:void(0);" selValue="1">30%</a></li>
+                            <li><a href="javascript:void(0);" selValue="2">50%</a></li>
+                            <li><a href="javascript:void(0);" selValue="3">70%</a></li>
+                        </ul>
+                      </div>
+                        <a class="searchBtn fl"><span>鏌ヨ</span></a>
+                    </div>
+                    <div class="rightPan"><a class="on">鍏ㄩ儴鏂规</a><a>鏈�杩戜笁涓湀 </a><a class="last">鏈�鏂颁慨鏀�</a></div>
+                </div>
+                <div class="tableBox">
+                	
+                	<table class="tblist">
+	                    <thead>
+	                        <tr>
+	                            <th style="width:44px;"></th>
+	                            <th>鏂规鍚�</th>
+	                            <th>椤圭洰</th>
+	                            <th>鍖哄煙</th>
+	                            <th>妤兼爧 </th>
+	                            <th> 淇敼鏃堕棿 </th>
+	                            <th>鎿嶄綔</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+	                        <tr class="odd">
+	                            <td>
+	                                <input type="checkbox" />
+	                            </td>
+	                            <td>51鏂规 </td>
+	                            <td>浜氫俊灏忚胺鍥� </td>
+	                            <td>浜屾湡</td>
+	                            <td> 01銆�02 </td>
+	                            <td>2016/03/28 15:00</td>
+	                            <td><a class="updatBtn">鏌ョ湅/淇敼</a></td>
+	                        </tr>
+	                        <tr class="edd">
+	                            <td>
+	                                <input type="checkbox" />
+	                            </td>
+	                            <td>51鏂规 </td>
+	                            <td>浜氫俊灏忚胺鍥� </td>
+	                            <td>浜屾湡</td>
+	                            <td> 01銆�02 </td>
+	                            <td>2016/03/28 15:00</td>
+	                            <td><a class="updatBtn">鏌ョ湅/淇敼</a></td>
+	                        </tr>
+	                        <tr class="odd">
+	                            <td>
+	                                <input type="checkbox" />
+	                            </td>
+	                            <td>51鏂规 </td>
+	                            <td>浜氫俊灏忚胺鍥� </td>
+	                            <td>浜屾湡</td>
+	                            <td> 01銆�02 </td>
+	                            <td>2016/03/28 15:00</td>
+	                            <td><a class="updatBtn">鏌ョ湅/淇敼</a></td>
+	                        </tr>
+	                        <tr class="edd">
+	                            <td>
+	                                <input type="checkbox" />
+	                            </td>
+	                            <td>鍙屽崄涓�瀹氫环鏂规 </td>
+	                            <td>浜氫俊灏忚胺鍥� </td>
+	                            <td>浜屾湡</td>
+	                            <td> 01銆�02 </td>
+	                            <td>2016/03/28 15:00</td>
+	                            <td><a class="updatBtn">鏌ョ湅/淇敼</a></td>
+	                        </tr>
+	                        <tr class="odd">
+	                            <td>
+	                                <input type="checkbox" />
+	                            </td>
+	                            <td>51鏂规 </td>
+	                            <td>浜氫俊灏忚胺鍥� </td>
+	                            <td>浜屾湡</td>
+	                            <td> 01銆�02 </td>
+	                            <td>2016/03/28 15:00</td>
+	                            <td><a class="updatBtn">鏌ョ湅/淇敼</a></td>
+	                        </tr>
+	                    </tbody>
+	                </table>
+	                <div class="paging clearfix mtp12">
+	                    <div class="pagediv"> <a class="first">涓婁竴椤�</a><a>1</a><a class="on">2</a><a>3</a><span>...</span><a>35</a><a class="last">涓嬩竴椤�</a></div>
+	                </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

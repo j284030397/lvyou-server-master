@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 统一资源模块 -->
+<QUERY>
+
+	<!-- 获取机构所拥有的站点列表 -->	
+	<SELECT ID="RESOURCE_AFFAIR_LIST">
+		<QUERY-TABLE>
+		    T_RESOURCE_AFFAIRS,
+		    T_RESOURCE_APPLICATION,
+		    T_RESOURCE_AFFAIRS_ACTION,
+		    T_RESOURCE_AFFAIRS_CATALOG,
+		    T_RESOURCE_AFFAIRS_STATUS
+		</QUERY-TABLE>
+		<FIELD>
+		     T_RESOURCE_AFFAIRS.ID AS id, 
+		     T_RESOURCE_AFFAIRS_CATALOG.CATNAME AS catName, 
+		     T_RESOURCE_APPLICATION.APPNAME  AS appName,
+		     T_RESOURCE_AFFAIRS.TITLE  AS title,
+		     T_RESOURCE_AFFAIRS.SENDER as sender,
+		     T_RESOURCE_AFFAIRS.SENDDATE as sendDate,
+		     T_RESOURCE_AFFAIRS.IMPORTANCE as importance,
+		     T_RESOURCE_AFFAIRS.OUTLINE AS outLine,
+		     T_RESOURCE_AFFAIRS.ISINTERNAL AS isInternal,
+		     T_RESOURCE_AFFAIRS.DEALSUGGEST AS dealSuggest
+	     </FIELD>
+		<WHERE>
+		  T_RESOURCE_AFFAIRS.APPID=T_RESOURCE_APPLICATION.ID  
+		  and 
+		  T_RESOURCE_AFFAIRS.STATUSID=T_RESOURCE_AFFAIRS_STATUS.ID
+          and 
+          T_RESOURCE_AFFAIRS.CATID=T_RESOURCE_AFFAIRS_CATALOG.ID
+          and 
+          T_RESOURCE_AFFAIRS_STATUS.CATID=T_RESOURCE_AFFAIRS_CATALOG.id
+          and 
+          T_RESOURCE_AFFAIRS_ACTION.AFFAIRSID=T_RESOURCE_AFFAIRS.ID
+          and 
+          T_RESOURCE_AFFAIRS.RECEIVER=:accunt
+          and
+          T_RESOURCE_AFFAIRS.HASDONE=:hasDone
+		</WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY>
+		T_RESOURCE_AFFAIRS.IMPORTANCE
+		</ORDER-BY>
+	</SELECT>
+	
+	<!-- 单点登陆 -->
+	<SELECT ID="RESOURCE_SSO_LIST">
+		<QUERY-TABLE>
+		   t_resource_application,
+		   t_sys_resource
+		   
+		</QUERY-TABLE>
+		<FIELD>
+		    t_sys_resource.code as txnCode ,
+		    t_resource_application.id as id,
+		     t_resource_application.appname as appName,
+		      t_resource_application.accurl as accUrl,
+		       t_resource_application.userformname as userFormName,
+		        t_resource_application.passformname as passFormName,
+		         t_resource_application.banknotename as bankNoteName
+		    
+	     </FIELD>
+		<WHERE>
+		 t_sys_resource.command=t_resource_application.id
+		 and
+		 t_resource_application.inuse='0'
+		</WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY>
+		</ORDER-BY>
+	</SELECT>
+	<!-- end -->
+	
+	
+	<!-- 快捷方式 -->
+	<SELECT ID="RESOURCE_TOOLKIT_LIST">
+		<QUERY-TABLE>
+		 t_resource_toolkit, 
+         t_sys_resource ,
+         t_sys_user 
+		</QUERY-TABLE>
+		<FIELD>
+		   t_resource_toolkit.id as id,
+		   t_resource_toolkit.shortname as shortName,
+		   t_sys_resource.code as resourceCode,
+		   t_sys_resource.name as resourceName,
+		   t_sys_resource.url as url,
+		   t_sys_user.username as userName		    
+	     </FIELD>
+		<WHERE>
+		 t_resource_toolkit.resourcecode=t_sys_resource.code
+         and
+         t_resource_toolkit.Userid=t_sys_user.id
+         and 
+         t_resource_toolkit.Userid=:userId
+		</WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY>
+		  t_resource_toolkit.sort 
+		</ORDER-BY>
+	</SELECT>
+	
+	<SELECT ID="RESOURCE_TOOLKIT_LIST_NOTORDER">
+		<QUERY-TABLE>
+		 t_resource_toolkit, 
+         t_sys_resource ,
+         t_sys_user 
+		</QUERY-TABLE>
+		<FIELD>
+		   t_resource_toolkit.id as id,
+		   t_resource_toolkit.shortname as shortName,
+		   t_resource_toolkit.sort as sort,
+		   t_sys_resource.code as resourceCode,
+		   t_sys_resource.name as resourceName,
+		   t_sys_resource.url as url,
+		   t_sys_user.username as userName		    
+	     </FIELD>
+		<WHERE>
+		 t_resource_toolkit.resourcecode=t_sys_resource.code
+         and
+         t_resource_toolkit.Userid=t_sys_user.id
+         and 
+         t_resource_toolkit.Userid=:userId
+		</WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	
+	<SELECT ID="RESOURCE_TOOLKITHISTORY_LIST_NOTORDER">
+		<QUERY-TABLE>
+		 t_resource_toolkithistory, 
+         t_sys_resource 
+		</QUERY-TABLE>
+		<FIELD>
+		   t_resource_toolkithistory.id as id,
+		   t_resource_toolkithistory.shortname as shortName,
+		   t_resource_toolkithistory.sort as sort,
+		   t_sys_resource.code as resourceCode,
+		   t_sys_resource.name as resourceName,
+		   t_sys_resource.url as url	    
+	     </FIELD>
+		<WHERE>
+		 t_resource_toolkithistory.resourcecode=t_sys_resource.code
+		</WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- end -->
+	
+	<!-- 根据用户获取通讯录的相关群组和人员信息 -->
+	<SELECT ID="GET_ADDRESSGROUP_BY_USERID">
+		<QUERY-TABLE>T_SYS_USER, T_RESOURCE_ADDRESS_GROUP_MAP, T_RESOURCE_ADDRESS_GROUP</QUERY-TABLE>
+		<FIELD>T_RESOURCE_ADDRESS_GROUP_MAP.ID AS id, T_RESOURCE_ADDRESS_GROUP_MAP.GID AS gId, T_SYS_USER.USERNAME AS username, T_RESOURCE_ADDRESS_GROUP.GROUPNAME AS groupName, T_SYS_USER.ID AS userId</FIELD>
+		<WHERE>T_RESOURCE_ADDRESS_GROUP_MAP.PAID = T_SYS_USER.ID AND T_RESOURCE_ADDRESS_GROUP_MAP.GID = T_RESOURCE_ADDRESS_GROUP.ID AND T_RESOURCE_ADDRESS_GROUP.PERSONID = :presonId</WHERE>
+	</SELECT>
+	
+	<!-- 根据消息编号获取消息接收人和其姓名 -->
+	<SELECT ID="GET_NOTIFICATIONREPLY_AND_USERNAME_BY_NOTID">
+		<QUERY-TABLE>T_RESOURCE_NOTIFICATIONREPLY, T_SYS_USER</QUERY-TABLE>
+		<FIELD>T_RESOURCE_NOTIFICATIONREPLY.ID AS id, T_RESOURCE_NOTIFICATIONREPLY.NOTIFICATIONINFOID AS notificationInfoId, T_RESOURCE_NOTIFICATIONREPLY.USERID AS userId, T_RESOURCE_NOTIFICATIONREPLY.STATUS AS status, T_RESOURCE_NOTIFICATIONREPLY.REPLYTIME AS replyTime, T_SYS_USER.USERNAME AS username</FIELD>
+		<WHERE>T_RESOURCE_NOTIFICATIONREPLY.USERID = T_SYS_USER.ID AND T_RESOURCE_NOTIFICATIONREPLY.NOTIFICATIONINFOID = :notificationInfoId</WHERE>
+	</SELECT>
+	
+	<!-- 根据接收人编号获取信息列表 -->
+	<SELECT ID="GET_NOTIFICATIONINOF_REPLYID">
+		<QUERY-TABLE>T_RESOURCE_NOTIFICATIONREPLY, T_SYS_USER, T_RESOURCE_NOTIFICATION_INFO</QUERY-TABLE>
+		<FIELD>T_RESOURCE_NOTIFICATION_INFO.ID AS id, T_RESOURCE_NOTIFICATION_INFO.TITLE AS title, T_RESOURCE_NOTIFICATION_INFO.SUMMARY AS summary, T_RESOURCE_NOTIFICATION_INFO.CONTENT AS content, T_RESOURCE_NOTIFICATION_INFO.SENDTYPE AS sendType, T_RESOURCE_NOTIFICATION_INFO.APPID AS appid, T_RESOURCE_NOTIFICATION_INFO.ISSUEDATE AS issueDate, T_RESOURCE_NOTIFICATION_INFO.STATUS AS status, T_SYS_USER.USERNAME AS username</FIELD>
+		<WHERE>T_RESOURCE_NOTIFICATIONREPLY.NOTIFICATIONINFOID = T_RESOURCE_NOTIFICATION_INFO.ID AND T_RESOURCE_NOTIFICATION_INFO.SENDPERSONNELID = T_SYS_USER.ID</WHERE>
+	</SELECT>
+	
+	<!-- 获取消息列表[发送方] -->
+	<SELECT ID="GET_NOTIFICATIONINOF_FOR_SENDER">
+		<QUERY-TABLE>T_RESOURCE_NOTIFICATION_INFO TN LEFT JOIN T_RESOURCE_NOTIFICATIONREPLY TR ON TN.ID = TR.NOTIFICATIONINFOID LEFT JOIN T_SYS_USER TU ON TR.USERID = TU.ID</QUERY-TABLE>
+		<FIELD>TN.ID AS id, TN.APPID AS appid, TN.TITLE AS title, TN.SUMMARY AS summary, TN.ISSUEDATE AS issueDate, TN.SENDPERSONNELID AS sendPersonnelId, TN.SENDTYPE AS sendType,  TN.STATUS AS status, TR.STATUS AS replyStatus, TU.USERNAME AS userName</FIELD>
+		<WHERE></WHERE>
+	</SELECT>
+	
+	
+	<!-- 机构通讯录导出 -->
+	<SELECT ID="IMPORT_ORG_ADDRESS">
+		<QUERY-TABLE>
+		(
+			SELECT 
+			TOG.NAME AS name, TOG.CODE AS code, TA.FULLNAME AS fullname, TA.WORKPHONE AS workphone, TA.WORKPHONE2 AS workphone2, TA.MOBILENUMBER AS mobilenumber, TA.MOBILENUMBER2 AS mobilenumber2, TA.FAX AS fax, TA.ADDRESS AS address, TA.POST AS post, TA.EMAILADDR AS emailaddr, TA.EMAILADDR2 AS emailaddr2
+			FROM 
+			T_RESOURCE_ORG_ADDRESS TA, T_SYS_ORG TOG 
+			WHERE
+			TA.ORGID = TOG.ID AND TA.DEPTID IS NULL 
+			
+			UNION ALL
+			
+			SELECT 
+			TDG.NAME AS name, TDG.CODE AS code, TA.FULLNAME AS fullname, TA.WORKPHONE AS workphone, TA.WORKPHONE2 AS workphone2, TA.MOBILENUMBER AS mobilenumber, TA.MOBILENUMBER2 AS mobilenumber2, TA.FAX AS fax, TA.ADDRESS AS address, TA.POST AS post, TA.EMAILADDR AS emailaddr, TA.EMAILADDR2 AS emailaddr2
+			FROM 
+			T_RESOURCE_ORG_ADDRESS TA, T_SYS_ORG TDG 
+			WHERE
+			TA.DEPTID = TDG.ID
+		)
+		T
+		</QUERY-TABLE>
+		<FIELD>T.NAME AS name, T.CODE AS code, T.FULLNAME AS fullname, T.WORKPHONE AS workphone, T.WORKPHONE2 AS workphone2, T.MOBILENUMBER AS mobilenumber, T.MOBILENUMBER2 AS mobilenumber2, T.FAX AS fax, T.ADDRESS AS address, T.POST AS post, T.EMAILADDR AS emailaddr, T.EMAILADDR2 AS emailaddr2</FIELD>
+		<WHERE></WHERE>
+		<GROUP-BY></GROUP-BY>
+		<ORDER-BY>T.CODE ASC</ORDER-BY>
+	</SELECT>
+	<!-- end -->
+	<!-- 个人通讯录导出 -->
+	<SELECT ID="IMPORT_MY_ADDRESS">
+		<QUERY-TABLE>
+		    (select c.personnelid as personnelid,
+           c.fullname as fullname,
+           c.workphone as workphone,
+           c.workphone2 as workphone2,
+           c.mobilephone as mobilephone,
+           c.mobilephone2 as mobilephone2,
+           c.fax as fax,
+           c.address as address,
+           c.post as post,
+           c.qqnum as qqnum,
+           c.msnaddr as msnaddr,
+           c.emailaddr as emailaddr,
+           c.emailaddr2 as emailaddr2
+                from t_resource_address_group_map a 
+                left join t_resource_address_group b on b.id=a.gid
+                left join t_resource_person_address c on c.personnelid=a.paid
+                 where b.id=:groupId ) f
+           left join t_sys_user d on d.id=f.personnelid
+		</QUERY-TABLE>
+		<FIELD>
+		       d.account as account,
+		       f.fullname as fullname,
+		       f.workphone as workphone,
+		       f.workphone2 as workphone2,
+		       f.mobilephone as mobilephone,
+		       f.mobilephone2 as mobilephone2,
+		       f.fax as fax,
+		       f.address as address,
+		       f.post as post,
+		       f.qqnum as qqnum,
+		       f.msnaddr as msnaddr,
+		       f.emailaddr as emailaddr,
+		       f.emailaddr2 as emailaddr2
+		</FIELD>
+		<WHERE>d.id=f.personnelid</WHERE>
+	</SELECT>
+	<!-- end -->
+	<!-- 获取所有用户信息及其从属机构和部门信息 -->
+	<SELECT ID="GET_USERPERADDRESS_AND_ORGDEPTNAME">
+		<QUERY-TABLE>T_SYS_USER TU , T_SYS_ORG TO1, T_SYS_ORG TO2,T_RESOURCE_PERSON_ADDRESS TO3</QUERY-TABLE>
+		<FIELD>
+		    TU.ID AS personnelId, TU.ACCOUNT AS account, 
+		    TU.USERNAME AS username, TU.POSITION as position,
+		    TU.POSITIONLEVLE as positionlevle,
+		    TO1.NAME AS orgName, 
+		    TO2.NAME AS workDeptName, TU.ADMINLEVLE AS adminLevle, 
+		    TU.SORTNO AS sortNo, 
+		    TU.COCALLSTATUS AS cocallStatus, 
+		    TU.USERSTATUS AS userStatus,
+		    TO3.WORKPHONE as workPhone,
+		    TO3.MOBILEPHONE as mobilePhone,
+		    TU.STATUS AS status
+		</FIELD>
+		<WHERE>TU.ORGID = TO1.ID AND TU.WORKDEPTID = TO2.ID AND TU.ID=TO3.PERSONNELID</WHERE>
+		<ORDER-BY>TO1.CODE ASC, TO2.CODE ASC, TU.SORTNO ASC</ORDER-BY>
+	</SELECT>
+	
+	
+	
+	<SELECT ID="DOWN_USER_ADDRESS">
+		<QUERY-TABLE>T_SYS_USER TU , T_SYS_ORG TO1, T_SYS_ORG TO2,T_RESOURCE_PERSON_ADDRESS TO3</QUERY-TABLE>
+		<FIELD>
+		    TU.ACCOUNT AS account, 
+		    TO3.FULLNAME as fullName,
+		    TO3.SEX as sex,
+		    TO3.WORKPHONE as workPhone,
+		    TO3.WORKPHONE2 as workPhone2,
+		    TO3.MOBILEPHONE as mobilePhone,
+		    TO3.MOBILEPHONE2 as mobilePhone2,
+		    TO3.FAX as fax,
+		    TO3.ADDRESS as address,
+		    TO3.POST as post,
+		    TO3.QQNUM as qqnum,
+		    TO3.MSNADDR as msnddr,
+		    TO3.EMAILADDR as email1,
+		    TO3.EMAILADDR2 as email2,
+		    TO3.COCALLNO as cocallno,
+		    TO3.REMARK as remark
+		</FIELD>
+		<WHERE>TU.ORGID = TO1.ID AND TU.WORKDEPTID = TO2.ID AND TU.ID=TO3.PERSONNELID</WHERE>
+		<ORDER-BY>TO1.CODE ASC, TO2.CODE ASC, TU.SORTNO ASC</ORDER-BY>
+	</SELECT>
+</QUERY>

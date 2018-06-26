@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 秀客模块 -->
+<QUERY>
+	<!-- 获取秀客照片及其相关信息 -->
+	<SELECT ID="SHOW_PIC_INFO">
+		<QUERY-TABLE>T_SHOW_COMMENT TSC,T_SHOW_PIC TSP LEFT JOIN T_SYS_USER TSU ON TSP.userId = TSU.id LEFT JOIN T_SHO_GOODS TSG ON TSP.goodsId = TSG.id LEFT JOIN T_SHO_BRAND TSB ON TSG.brandId = TSB.id LEFT JOIN T_SHO_GOODSTYPE TSGT ON TSG.typeId = TSGT.id</QUERY-TABLE>
+		<FIELD>TSP.id AS id, TSP.userId AS userId, TSP.goodsId AS goodsId, TSP.typeId AS typeId, TSP.name AS name, TSP.intro AS intro, TSP.picUrl AS picUrl, TSP.uploadTime AS uploadTime, TSU.username AS username, TSG.name AS goodName, TSB.name AS brandName,TSC.content as content</FIELD>
+		<WHERE>TSC.id =TSP.typeId</WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT>
+	<!-- <SELECT ID="SHOW_PIC_INFO">
+		<QUERY-TABLE>T_SHOW_PIC TSP LEFT JOIN T_SYS_USER TSU ON TSP.userId = TSU.id LEFT JOIN T_SHO_GOODS TSG ON TSP.goodsId = TSG.id LEFT JOIN T_SHO_BRAND TSB ON TSG.brandId = TSB.id LEFT JOIN T_SHO_GOODSTYPE TSGT ON TSG.typeId = TSGT.id</QUERY-TABLE>
+		<FIELD>TSP.id AS id, TSP.userId AS userId, TSP.goodsId AS goodsId, TSP.typeId AS typeId, TSP.name AS name, TSP.intro AS intro, TSP.picUrl AS picUrl, TSP.uploadTime AS uploadTime, TSU.username AS username, TSG.name AS goodName, TSB.name AS brandName</FIELD>
+		<WHERE></WHERE>
+		<ORDER-BY></ORDER-BY>
+	</SELECT> -->
+	<!-- 获取秀客图片举报信息-->
+	<SELECT ID="SHOW_PIC_PICPROSECUTE_INFO">
+		<QUERY-TABLE>  
+    		T_SHOW_PICPROSECUTE TPRO LEFT JOIN T_SHOW_PIC TPIC ON TPRO.PICID=TPIC.ID LEFT JOIN T_SYS_USER TUR ON TPIC.USERID=TUR.ID
+   		</QUERY-TABLE>
+		<FIELD>TPRO.PICID AS picId,TPIC.PICURL AS picUrl,TPRO.CONTENT AS content,TUR.USERNAME AS username,TPRO.PROSECUTETIME AS prosecuteTime,TPRO.HANDLECONTENT AS handleContent,TPRO.HANDLETIME AS handleTime,TPRO.STATUS as status,TPRO.ID as id</FIELD>
+		<WHERE></WHERE>
+		<ORDER-BY>TPRO.PROSECUTETIME</ORDER-BY>
+	</SELECT>
+</QUERY>
